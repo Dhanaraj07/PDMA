@@ -67,11 +67,9 @@ class _DiscoveryScreenState extends ConsumerState<DiscoveryScreen> {
                         trailing: IconButton(
                           icon: const Icon(Icons.favorite_border),
                           onPressed: () {
-                            final favorites = ref.read(
-                              favoritesProvider.notifier,
-                            );
-
-                            favorites.state = [...favorites.state, user.email];
+                            ref
+                                .read(favoritesProvider.notifier)
+                                .addFavorite(user.email);
 
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(

@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'profile_details_screen.dart';
 import '../data/profile_model.dart';
 import '../providers/profile_provider.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 
 class CreateProfileScreen extends ConsumerWidget {
   CreateProfileScreen({super.key});

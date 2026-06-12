@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'discovery_screen.dart';
 import 'favorites_screen.dart';
+import 'package:profile_discovery_app/features/settings/screens/settings_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -16,6 +17,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Widget> screens = [
     const DiscoveryScreen(),
     const FavoritesScreen(),
+    const SettingsScreen(),
   ];
 
   @override
@@ -38,6 +40,11 @@ class _HomeScreenState extends State<HomeScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.favorite),
             label: "Favorites",
+          ),
+
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: "Settings",
           ),
         ],
       ),

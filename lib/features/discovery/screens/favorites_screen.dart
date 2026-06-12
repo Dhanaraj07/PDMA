@@ -19,7 +19,17 @@ class FavoritesScreen extends ConsumerWidget {
               itemBuilder: (context, index) {
                 return ListTile(
                   leading: const Icon(Icons.favorite, color: Colors.red),
+
                   title: Text(favorites[index]),
+
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete),
+                    onPressed: () {
+                      ref
+                          .read(favoritesProvider.notifier)
+                          .removeFavorite(favorites[index]);
+                    },
+                  ),
                 );
               },
             ),
