@@ -12,12 +12,17 @@ class FavoritesScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text("Favorites")),
-      body: ListView.builder(
-        itemCount: favorites.length,
-        itemBuilder: (context, index) {
-          return ListTile(title: Text(favorites[index]));
-        },
-      ),
+      body: favorites.isEmpty
+          ? const Center(child: Text("No Favorites Yet"))
+          : ListView.builder(
+              itemCount: favorites.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  leading: const Icon(Icons.favorite, color: Colors.red),
+                  title: Text(favorites[index]),
+                );
+              },
+            ),
     );
   }
 }
