@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'features/auth/presentation/screens/login_screen.dart';
-import 'features/auth/presentation/screens/register_screen.dart';
-import 'features/auth/presentation/screens/forgot_password_screen.dart';
-import 'features/auth/presentation/screens/splash_screen.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'features/auth/screens/splash_screen.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -13,17 +12,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
-
-      initialRoute: '/',
-
-      routes: {
-        '/': (_) => const SplashScreen(),
-        '/login': (_) => LoginScreen(),
-        '/register': (_) => RegisterScreen(),
-        '/forgot-password': (_) => ForgotPasswordScreen(),
-      },
+      home: SplashScreen(),
     );
   }
 }

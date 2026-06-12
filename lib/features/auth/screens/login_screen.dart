@@ -4,6 +4,7 @@ class LoginScreen extends StatelessWidget {
   LoginScreen({super.key});
 
   final emailController = TextEditingController();
+
   final passwordController = TextEditingController();
 
   @override
@@ -30,20 +31,6 @@ class LoginScreen extends StatelessWidget {
             const SizedBox(height: 20),
 
             ElevatedButton(onPressed: () {}, child: const Text("Login")),
-
-            TextButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/register');
-              },
-              child: const Text("Register"),
-            ),
-
-            TextButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/forgot-password');
-              },
-              child: const Text("Forgot Password"),
-            ),
           ],
         ),
       ),
