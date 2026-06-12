@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import 'edit_profile_screen.dart';
 import '../providers/profile_provider.dart';
 
 class ProfileDetailsScreen extends ConsumerWidget {
@@ -46,6 +46,17 @@ class ProfileDetailsScreen extends ConsumerWidget {
             const SizedBox(height: 10),
 
             Text("About : ${profile.aboutMe}"),
+            const SizedBox(height: 20),
+
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const EditProfileScreen()),
+                );
+              },
+              child: const Text("Edit Profile"),
+            ),
           ],
         ),
       ),
