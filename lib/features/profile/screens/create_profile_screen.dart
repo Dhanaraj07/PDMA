@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import 'profile_details_screen.dart';
 import '../data/profile_model.dart';
 import '../providers/profile_provider.dart';
 
@@ -82,9 +82,12 @@ class CreateProfileScreen extends ConsumerWidget {
 
                 ref.read(profileProvider.notifier).state = profile;
 
-                ScaffoldMessenger.of(
+                Navigator.push(
                   context,
-                ).showSnackBar(const SnackBar(content: Text("Profile Saved")));
+                  MaterialPageRoute(
+                    builder: (_) => const ProfileDetailsScreen(),
+                  ),
+                );
               },
               child: const Text("Save Profile"),
             ),
