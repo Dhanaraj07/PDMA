@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import 'user_details_screen.dart';
+import '../../profile/providers/profile_provider.dart';
+import '../../profile/screens/profile_details_screen.dart';
 import '../providers/favorites_provider.dart';
 
 class FavoritesScreen extends ConsumerWidget {
@@ -8,26 +12,58 @@ class FavoritesScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final profiles = ref.watch(profileProvider);
+
     final favorites = ref.watch(favoritesProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Favorites")),
+      appBar: AppBar(title: const Text("Favorite Profiles")),
+
       body: favorites.isEmpty
-          ? const Center(child: Text("No Favorites Yet"))
+          ? const Center(
+              child: Text(
+                "No Favorite Profiles Yet",
+                style: TextStyle(fontSize: 18),
+              ),
+            )
           : ListView.builder(
+              padding: const EdgeInsets.all(12),
               itemCount: favorites.length,
               itemBuilder: (context, index) {
-                return ListTile(
-                  leading: const Icon(Icons.favorite, color: Colors.red),
+                final profileIndex = favorites[index];
 
-                  title: Text(favorites[index]),
+                if (profileIndex >= profiles.length) {
+                  return const SizedBox();
+                }
 
-                  trailing: IconButton(
-                    icon: const Icon(Icons.delete),
-                    onPressed: () {
-                      ref
-                          .read(favoritesProvider.notifier)
-                          .removeFavorite(favorites[index]);
+                final profile = profiles[profileIndex];
+
+                return Card(
+                  margin: const EdgeInsets.symmetric(vertical: 6),
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      radius: 25,
+                      backgroundImage: profile.imagePath.isNotEmpty
+                          ? FileImage(File(profile.imagePath))
+                          : null,
+                      child: profile.imagePath.isEmpty
+                          ? const Icon(Icons.person)
+                          : null,
+                    ),
+
+                    title: Text(profile.fullName),
+
+                    subtitle: Text(profile.location),
+
+                    trailing: const Icon(Icons.favorite, color: Colors.red),
+
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => UserDetailsScreen(profile: profile),
+                        ),
+                      );
                     },
                   ),
                 );

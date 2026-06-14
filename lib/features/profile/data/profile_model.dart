@@ -49,6 +49,7 @@ class ProfileModel {
 
   String toJson() => jsonEncode(toMap());
 
-  factory ProfileModel.fromJson(String source) =>
-      ProfileModel.fromMap(jsonDecode(source));
+  factory ProfileModel.fromJson(String source) {
+    return ProfileModel.fromMap(jsonDecode(source));
+  }
 }

@@ -1,33 +1,50 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive/hive.dart';
+import 'dart:convert';
 
-class FavoritesNotifier extends StateNotifier<List<String>> {
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+final favoritesProvider = StateNotifierProvider<FavoritesNotifier, List<int>>(
+  (ref) => FavoritesNotifier(),
+);
+
+class FavoritesNotifier extends StateNotifier<List<int>> {
   FavoritesNotifier() : super([]) {
     loadFavorites();
   }
 
-  final box = Hive.box('favorites');
+  Future<void> loadFavorites() async {
+    final prefs = await SharedPreferences.getInstance();
 
-  void loadFavorites() {
-    state = List<String>.from(box.get('items', defaultValue: []));
-  }
+    final data = prefs.getString('favorites');
 
-  void addFavorite(String email) {
-    if (!state.contains(email)) {
-      state = [...state, email];
+    if (data != null) {
+      final List decoded = jsonDecode(data);
 
-      box.put('items', state);
+      state = decoded.cast<int>();
     }
   }
 
-  void removeFavorite(String email) {
-    state = state.where((item) => item != email).toList();
+  Future<void> saveFavorites() async {
+    final prefs = await SharedPreferences.getInstance();
 
-    box.put('items', state);
+    await prefs.setString('favorites', jsonEncode(state));
+  }
+
+  Future<void> toggleFavorite(int index) async {
+    if (state.contains(index)) {
+      state = state.where((e) => e != index).toList();
+    } else {
+      state = [...state, index];
+    }
+
+    await saveFavorites();
+  }
+
+  Future<void> clearFavorites() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    await prefs.remove('favorites');
+
+    state = [];
   }
 }
-
-final favoritesProvider =
-    StateNotifierProvider<FavoritesNotifier, List<String>>(
-      (ref) => FavoritesNotifier(),
-    );

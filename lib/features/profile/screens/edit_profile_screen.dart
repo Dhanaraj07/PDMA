@@ -1,11 +1,16 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../data/profile_model.dart';
 import '../providers/profile_provider.dart';
 
 class EditProfileScreen extends ConsumerStatefulWidget {
-  const EditProfileScreen({super.key});
+  final int profileIndex;
+
+  const EditProfileScreen({super.key, required this.profileIndex});
 
   @override
   ConsumerState<EditProfileScreen> createState() => _EditProfileScreenState();
@@ -20,88 +25,198 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   late TextEditingController location;
   late TextEditingController about;
 
+  File? selectedImage;
+
   @override
   void initState() {
     super.initState();
 
-    final profile = ref.read(profileProvider);
+    final profile = ref.read(profileProvider)[widget.profileIndex];
 
-    fullName = TextEditingController(text: profile?.fullName ?? '');
+    fullName = TextEditingController(text: profile.fullName);
+    age = TextEditingController(text: profile.age);
+    email = TextEditingController(text: profile.email);
+    phone = TextEditingController(text: profile.phone);
+    occupation = TextEditingController(text: profile.occupation);
+    location = TextEditingController(text: profile.location);
+    about = TextEditingController(text: profile.aboutMe);
 
-    age = TextEditingController(text: profile?.age ?? '');
+    if (profile.imagePath.isNotEmpty) {
+      selectedImage = File(profile.imagePath);
+    }
+  }
 
-    email = TextEditingController(text: profile?.email ?? '');
+  Future<void> pickImage() async {
+    final image = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 80,
+    );
 
-    phone = TextEditingController(text: profile?.phone ?? '');
+    if (image != null) {
+      setState(() {
+        selectedImage = File(image.path);
+      });
+    }
+  }
 
-    occupation = TextEditingController(text: profile?.occupation ?? '');
+  InputDecoration customDecoration(String label, IconData icon) {
+    return InputDecoration(
+      labelText: label,
+      prefixIcon: Icon(icon),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+      ),
+    );
+  }
 
-    location = TextEditingController(text: profile?.location ?? '');
+  void updateProfile() {
+    if (fullName.text.trim().isEmpty ||
+        age.text.trim().isEmpty ||
+        email.text.trim().isEmpty ||
+        phone.text.trim().isEmpty ||
+        occupation.text.trim().isEmpty ||
+        location.text.trim().isEmpty ||
+        about.text.trim().isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Please fill all fields")));
+      return;
+    }
 
-    about = TextEditingController(text: profile?.aboutMe ?? '');
+    final updatedProfile = ProfileModel(
+      fullName: fullName.text.trim(),
+      age: age.text.trim(),
+      email: email.text.trim(),
+      phone: phone.text.trim(),
+      occupation: occupation.text.trim(),
+      location: location.text.trim(),
+      aboutMe: about.text.trim(),
+      imagePath: selectedImage?.path ?? '',
+    );
+
+    ref
+        .read(profileProvider.notifier)
+        .updateProfile(widget.profileIndex, updatedProfile);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Profile Updated Successfully")),
+    );
+
+    Navigator.pop(context);
+    Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Edit Profile")),
+      appBar: AppBar(title: const Text("Edit Profile"), centerTitle: true),
+
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
+
         child: Column(
           children: [
+            GestureDetector(
+              onTap: pickImage,
+
+              child: Stack(
+                alignment: Alignment.bottomRight,
+
+                children: [
+                  CircleAvatar(
+                    radius: 60,
+                    backgroundColor: Colors.grey.shade200,
+                    backgroundImage: selectedImage != null
+                        ? FileImage(selectedImage!)
+                        : null,
+                    child: selectedImage == null
+                        ? const Icon(Icons.person, size: 60)
+                        : null,
+                  ),
+
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: const BoxDecoration(
+                      color: Colors.blue,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.camera_alt,
+                      color: Colors.white,
+                      size: 18,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 30),
+
             TextField(
               controller: fullName,
-              decoration: const InputDecoration(labelText: "Full Name"),
+              decoration: customDecoration("Full Name", Icons.person),
             ),
+
+            const SizedBox(height: 15),
 
             TextField(
               controller: age,
-              decoration: const InputDecoration(labelText: "Age"),
+              keyboardType: TextInputType.number,
+              decoration: customDecoration("Age", Icons.cake),
             ),
+
+            const SizedBox(height: 15),
 
             TextField(
               controller: email,
-              decoration: const InputDecoration(labelText: "Email"),
+              keyboardType: TextInputType.emailAddress,
+              decoration: customDecoration("Email", Icons.email),
             ),
+
+            const SizedBox(height: 15),
 
             TextField(
               controller: phone,
-              decoration: const InputDecoration(labelText: "Phone"),
+              keyboardType: TextInputType.phone,
+              decoration: customDecoration("Phone Number", Icons.phone),
             ),
+
+            const SizedBox(height: 15),
 
             TextField(
               controller: occupation,
-              decoration: const InputDecoration(labelText: "Occupation"),
+              decoration: customDecoration("Occupation", Icons.work),
             ),
+
+            const SizedBox(height: 15),
 
             TextField(
               controller: location,
-              decoration: const InputDecoration(labelText: "Location"),
+              decoration: customDecoration("Location", Icons.location_on),
             ),
+
+            const SizedBox(height: 15),
 
             TextField(
               controller: about,
-              decoration: const InputDecoration(labelText: "About Me"),
+              maxLines: 4,
+              decoration: customDecoration("About Me", Icons.info),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 25),
 
-            ElevatedButton(
-              onPressed: () {
-                ref.read(profileProvider.notifier).state = ProfileModel(
-                  fullName: fullName.text,
-                  age: age.text,
-                  email: email.text,
-                  phone: phone.text,
-                  occupation: occupation.text,
-                  location: location.text,
-                  aboutMe: about.text,
-                  imagePath: '',
-                );
-
-                Navigator.pop(context);
-              },
-              child: const Text("Update"),
+            SizedBox(
+              width: double.infinity,
+              height: 55,
+              child: ElevatedButton.icon(
+                onPressed: updateProfile,
+                icon: const Icon(Icons.edit),
+                label: const Text(
+                  "Update Profile",
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
             ),
           ],
         ),

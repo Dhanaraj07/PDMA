@@ -1,95 +1,138 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../profile/providers/profile_provider.dart';
+import '../../profile/screens/profile_details_screen.dart';
 
 import '../providers/discovery_provider.dart';
 import '../providers/favorites_provider.dart';
 
-class DiscoveryScreen extends ConsumerStatefulWidget {
+class DiscoveryScreen extends ConsumerWidget {
   const DiscoveryScreen({super.key});
 
   @override
-  ConsumerState<DiscoveryScreen> createState() => _DiscoveryScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final profiles = ref.watch(profileProvider);
 
-class _DiscoveryScreenState extends ConsumerState<DiscoveryScreen> {
-  String searchText = '';
+    final search = ref.watch(searchProvider);
 
-  @override
-  Widget build(BuildContext context) {
-    final users = ref.watch(discoveryProvider);
+    final selectedLocation = ref.watch(locationFilterProvider);
+
+    final locations = ['All', ...profiles.map((e) => e.location).toSet()];
+
+    final filteredProfiles = profiles.where((profile) {
+      final searchMatch = profile.fullName.toLowerCase().contains(
+        search.toLowerCase(),
+      );
+
+      final locationMatch = selectedLocation == 'All'
+          ? true
+          : profile.location == selectedLocation;
+
+      return searchMatch && locationMatch;
+    }).toList();
 
     return Scaffold(
       appBar: AppBar(title: const Text("Discover Profiles")),
-      body: users.when(
-        data: (data) {
-          final filteredUsers = data.where((user) {
-            return user.name.toLowerCase().contains(searchText.toLowerCase());
-          }).toList();
 
-          return Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(12),
-                child: TextField(
-                  decoration: const InputDecoration(
-                    hintText: "Search Profiles",
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.search),
-                  ),
-                  onChanged: (value) {
-                    setState(() {
-                      searchText = value;
-                    });
-                  },
-                ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: TextField(
+              decoration: const InputDecoration(
+                hintText: "Search Profiles",
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(),
               ),
+              onChanged: (value) {
+                ref.read(searchProvider.notifier).state = value;
+              },
+            ),
+          ),
 
-              Expanded(
-                child: ListView.builder(
-                  itemCount: filteredUsers.length,
-                  itemBuilder: (context, index) {
-                    final user = filteredUsers[index];
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: DropdownButtonFormField<String>(
+              value: selectedLocation,
+              decoration: const InputDecoration(
+                labelText: "Filter by Location",
+                border: OutlineInputBorder(),
+              ),
+              items: locations.map((location) {
+                return DropdownMenuItem(value: location, child: Text(location));
+              }).toList(),
+              onChanged: (value) {
+                ref.read(locationFilterProvider.notifier).state = value!;
+              },
+            ),
+          ),
 
-                    return Card(
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
-                      child: ListTile(
-                        leading: CircleAvatar(
-                          backgroundImage: NetworkImage(user.image),
+          const SizedBox(height: 10),
+
+          Expanded(
+            child: filteredProfiles.isEmpty
+                ? const Center(child: Text("No Profiles Found"))
+                : ListView.builder(
+                    itemCount: filteredProfiles.length,
+                    itemBuilder: (context, index) {
+                      final profile = filteredProfiles[index];
+
+                      final favorites = ref.watch(favoritesProvider);
+
+                      final isFavorite = favorites.contains(index);
+
+                      return Card(
+                        margin: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
                         ),
+                        child: ListTile(
+                          leading: CircleAvatar(
+                            backgroundImage: profile.imagePath.isNotEmpty
+                                ? FileImage(File(profile.imagePath))
+                                : null,
+                            child: profile.imagePath.isEmpty
+                                ? const Icon(Icons.person)
+                                : null,
+                          ),
 
-                        title: Text(user.name),
+                          title: Text(profile.fullName),
 
-                        subtitle: Text(user.location),
+                          subtitle: Text(profile.location),
 
-                        trailing: IconButton(
-                          icon: const Icon(Icons.favorite_border),
-                          onPressed: () {
-                            ref
-                                .read(favoritesProvider.notifier)
-                                .addFavorite(user.email);
+                          trailing: IconButton(
+                            icon: Icon(
+                              isFavorite
+                                  ? Icons.favorite
+                                  : Icons.favorite_border,
+                              color: isFavorite ? Colors.red : null,
+                            ),
+                            onPressed: () {
+                              ref
+                                  .read(favoritesProvider.notifier)
+                                  .toggleFavorite(index);
+                            },
+                          ),
 
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text("Added to Favorites"),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => ProfileDetailsScreen(
+                                  profileIndex: profiles.indexOf(profile),
+                                ),
                               ),
                             );
                           },
                         ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          );
-        },
-
-        error: (e, s) => Center(child: Text(e.toString())),
-
-        loading: () => const Center(child: CircularProgressIndicator()),
+                      );
+                    },
+                  ),
+          ),
+        ],
       ),
     );
   }
