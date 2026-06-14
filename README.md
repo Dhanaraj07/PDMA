@@ -1,8 +1,8 @@
 # PDMA - Profile Discovery Management App
 
-## Overview
+## Project Overview
 
-PDMA (Profile Discovery Management App) is a Flutter application that allows users to create, manage, discover, search, filter, and favorite profiles. The app also integrates with the Random User API to display suggested profiles.
+PDMA (Profile Discovery Management App) is a Flutter-based mobile application that allows users to create, manage, discover, search, filter, and favorite profiles. The application also integrates with the Random User API to provide suggested profiles.
 
 ---
 
@@ -10,8 +10,8 @@ PDMA (Profile Discovery Management App) is a Flutter application that allows use
 
 ### Authentication
 
-* User Login
 * User Registration
+* User Login
 * Forgot Password
 
 ### Profile Management
@@ -21,7 +21,7 @@ PDMA (Profile Discovery Management App) is a Flutter application that allows use
 * Delete Profile
 * Upload Profile Picture
 * View Profile Details
-* Local Storage using SharedPreferences
+* Multiple Profile Support
 
 ### Profile Discovery
 
@@ -29,103 +29,48 @@ PDMA (Profile Discovery Management App) is a Flutter application that allows use
 * Search Profiles
 * Filter Profiles by Location
 * View Profile Details
-* Save/Favorite Profiles
+* Favorite Profiles
 
 ### API Integration
 
 * Random User API
 * Suggested Profiles
-* Loading State Handling
-* Error State Handling
-* JSON Response Parsing
+* API Error Handling
+* Loading States
 
 ### Favorites
 
-* Add Profiles to Favorites
+* Add to Favorites
+* Remove from Favorites
 * View Favorite Profiles
-* Profile Details from Favorites
-
----
-
-## Technologies Used
-
-* Flutter
-* Dart
-* Riverpod (State Management)
-* SharedPreferences
-* Dio (API Calls)
-* Image Picker
-* Random User API
-
----
-
-## Project Structure
-
-lib/
-├── features/
-│ ├── auth/
-│ ├── profile/
-│ ├── discovery/
-│ └── settings/
-├── home/
-└── main.dart
-
----
-
-## Packages
-
-* flutter_riverpod
-* dio
-* shared_preferences
-* image_picker
-* cached_network_image
-* flutter_screenutil
-
----
-
-## Screens
-
-### Profile
-
-* Create Profile
-* Edit Profile
-* Profile Details
-* Profile List
-
-### Discovery
-
-* Search Profiles
-* Filter Profiles
-* Suggested Profiles (API)
-* Favorites
 
 ### Settings
 
-* App Settings Page
+* Application Settings Screen
 
 ---
 
-## Installation
+## Project Setup Instructions
 
-1. Clone the repository
-
-```bash
-git clone <repository-url>
-```
-
-2. Navigate to project
+### Clone Repository
 
 ```bash
-cd profile_discovery_app
+git clone https://github.com/Dhanaraj07/PDMA.git
 ```
 
-3. Install dependencies
+### Navigate to Project
+
+```bash
+cd PDMA
+```
+
+### Install Dependencies
 
 ```bash
 flutter pub get
 ```
 
-4. Run application
+### Run Application
 
 ```bash
 flutter run
@@ -133,13 +78,80 @@ flutter run
 
 ---
 
-## Build APK
+## Architecture Overview
+
+The application follows a feature-based architecture with Riverpod state management.
+
+### Layers
+
+1. Presentation Layer
+
+   * Screens
+   * Widgets
+
+2. State Management Layer
+
+   * Riverpod Providers
+
+3. Data Layer
+
+   * Models
+   * API Services
+
+4. Storage Layer
+
+   * SharedPreferences
+
+---
+
+## Project Structure
+
+```text
+lib/
+│
+├── features/
+│   ├── auth/
+│   ├── profile/
+│   ├── discovery/
+│   └── settings/
+│
+├── shared/
+│
+└── main.dart
+```
+
+---
+
+## Libraries Used
+
+| Package              | Purpose               |
+| -------------------- | --------------------- |
+| flutter_riverpod     | State Management      |
+| dio                  | API Requests          |
+| shared_preferences   | Local Storage         |
+| image_picker         | Profile Image Upload  |
+| cached_network_image | Network Image Caching |
+| flutter_screenutil   | Responsive UI         |
+
+---
+
+## Assumptions and Decisions
+
+* Riverpod is used for scalable state management.
+* SharedPreferences is used for local profile persistence.
+* Random User API is used to demonstrate API integration.
+* Favorites are stored locally.
+* Profile images are selected from the device gallery.
+
+---
+
+## APK Build
 
 ```bash
 flutter build apk --release
 ```
 
-APK Location:
+Output:
 
 ```text
 build/app/outputs/flutter-apk/app-release.apk
@@ -151,4 +163,4 @@ build/app/outputs/flutter-apk/app-release.apk
 
 Dhanaraj
 
-Flutter Developer Project - PDMA
+PDMA - Profile Discovery Management App
