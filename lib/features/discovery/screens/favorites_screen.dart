@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'user_details_screen.dart';
 import '../../profile/providers/profile_provider.dart';
-import '../../profile/screens/profile_details_screen.dart';
 import '../providers/favorites_provider.dart';
 
 class FavoritesScreen extends ConsumerWidget {
